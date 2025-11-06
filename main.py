@@ -1,9 +1,10 @@
 import fastapi
 import uvicorn
-from controllers import upload_router
+from controllers import send_router, upload_router
 
 app = fastapi.FastAPI()
 app.include_router(upload_router.router)
+app.include_router(send_router.router)
 
 @app.get("/")
 async def root():
