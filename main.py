@@ -8,7 +8,7 @@ app.include_router(send_router.router)
 
 @app.get("/")
 async def root():
-    return{"message": "Was poppin?"}
+    return{"message": "Wus poppin?"}
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host='127.0.0.1', workers=1)
