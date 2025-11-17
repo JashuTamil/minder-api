@@ -12,7 +12,7 @@ feedback_path = pathlib.Path("movie_rec/user_data/feedback.json")
 def load():
     df = pd.read_csv("movie_rec/data/TMDB_movie_dataset_v11.csv")
     df = df[df['vote_count'] >= 10]
-    df = df[['id', 'title', 'genres', 'overview', 'vote_average', 'vote_count', 'runtime']].fillna('')
+    df = df[['id', 'title', 'genres', 'overview', 'vote_average', 'vote_count', 'runtime', 'poster_path']].fillna('')
     df['genres'] = df['genres'].apply(lambda x: x.split(", "))
     return df
 
@@ -98,5 +98,8 @@ def recommend_movies(features, movies, user_vector, feedback, exploration_rate =
     else:
         recs = exploitative_rec(movies, feedback, 1000)
         recs['recommendation_type'] = 'exploitation'
-
-    return recs
+    
+    recs['poster_path'] = "https://image.tmdb.org/t/p/w500" + recs['poster_path']
+    
+    print(recs['poster_path'])
+    return dict(recs)

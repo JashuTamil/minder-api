@@ -21,5 +21,3 @@ if len(feedback['likes']) == 0:
 
 user_vec = build_user_profile(features, movies, feedback)
 recs = recommend_movies(features, movies, user_vec, feedback, top_n = 10)
-
-print(recs)
