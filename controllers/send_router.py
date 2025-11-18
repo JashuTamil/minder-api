@@ -8,8 +8,6 @@ router = APIRouter(prefix="/api/v1/get")
 
 @router.get("/get_file/")
 async def send_file(file: UploadFile = File(...)):
-
     feedback = load_feedback()
-
     return FileResponse(feedback, media_type="application/json", filename="feedback.json")
 

@@ -49,8 +49,8 @@ def save_feedback(feedback):
 
 
 def build_user_profile(features, movies, feedback, alpha=0.5):
-    liked = feedback["likes"]
-    disliked = feedback['dislikes']
+    liked = [movie['id'] for movie in feedback['likes']]
+    disliked = [movie['id'] for movie in feedback['dislikes']]
 
     features_csr = features.tocsr()
 
