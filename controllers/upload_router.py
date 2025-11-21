@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 
 router = APIRouter(prefix="/api/v1/upload")
 
-@router.post("/upload_file/")
+@router.post("/send_feedback/")
 async def file_upload(file: UploadFile = File(...)):
     with open(f"movie_rec/user_data/{file.filename}", "wb") as buffer:
         buffer.write(await file.read())

@@ -1,0 +1,25 @@
+{"likes":
+    [
+        {
+        "id": 27205,
+        "name": "Inception",
+        "director": "Christopher Nolan",
+        "cast": ["Leonardo DiCaprio", "Joseph Gordon-Levitt", "Ellen Page"],
+        "year": 2010,
+        "description": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
+        "url": "https://www.movieposters.com/cdn/shop/files/inception.mpw.123395_9e0000d1-bc7f-400a-b488-15fa9e60a10c.jpg?v=1708527589&width=1680"
+    }
+    ],
+"dislikes": 
+[
+    {
+        "id": 603,
+        "name": "The Matrix",
+        "director": "The Wachowskis",
+        "cast": ["Keanu Reeves", "Laurence Fishburne", "Carrie-Anne Moss"],
+        "year": 1999,
+        "description": "A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers.",
+        "url": "https://www.movieposters.com/cdn/shop/files/Matrix.mpw.102176_bb2f6cc5-4a16-4512-881b-f855ead3c8ec.jpg?v=1708703624&width=1680"
+    }
+]
+}

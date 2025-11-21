@@ -7,7 +7,7 @@ import numpy as np
 import json
 import pathlib
 
-feedback_path = pathlib.Path("movie_rec/user_data/feedback.json")
+feedback_path = pathlib.Path("movie_rec/data/feedback.json")
 
 def load():
     df = pd.read_csv("movie_rec/data/TMDB_movie_dataset_v11.csv")
