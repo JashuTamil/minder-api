@@ -49,8 +49,8 @@ def save_feedback(feedback):
 
 
 def build_user_profile(features, movies, feedback, alpha=0.5):
-    liked = [movie['id'] for movie in feedback['likes']]
-    disliked = [movie['id'] for movie in feedback['dislikes']]
+    liked = [movie for movie in feedback['likes']]
+    disliked = [movie for movie in feedback['dislikes']]
 
     features_csr = features.tocsr()
 
@@ -101,5 +101,6 @@ def recommend_movies(features, movies, user_vector, feedback, exploration_rate =
     
     recs['poster_path'] = "https://image.tmdb.org/t/p/w500" + recs['poster_path']
     
-    print(recs['poster_path'])
-    return dict(recs)
+    recs = dict(recs)
+    print(recs.keys())
+    return recs
