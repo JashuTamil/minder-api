@@ -8,6 +8,7 @@ import json
 import pathlib
 
 feedback_path = pathlib.Path("movie_rec/data/feedback.json")
+extras = ['genres', 'vote_count']
 
 def load():
     df = pd.read_csv("movie_rec/data/TMDB_movie_dataset_v11.csv")
@@ -102,5 +103,5 @@ def recommend_movies(features, movies, user_vector, feedback, exploration_rate =
     recs['poster_path'] = "https://image.tmdb.org/t/p/w500" + recs['poster_path']
     
     recs = dict(recs)
-    print(recs.keys())
+    print(recs['vote_average'])
     return recs

@@ -9,6 +9,8 @@ class MovieType(pydantic.BaseModel):
     year: int
     description: str
     url: str
+    runtime: int
+    rating: float
 
 class FeedbackResponse(pydantic.BaseModel):
     likes: List[MovieType]
