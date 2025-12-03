@@ -6,9 +6,14 @@ import scipy.sparse as sp
 import numpy as np
 import json
 import pathlib
+import requests
 
 feedback_path = pathlib.Path("movie_rec/data/feedback.json")
 extras = ['genres', 'vote_count']
+
+params = {
+    "api_key": "fc2e3ee1697f621f0af000955dfb1dc1"
+}
 
 def load():
     df = pd.read_csv("movie_rec/data/TMDB_movie_dataset_v11.csv")
@@ -94,14 +99,38 @@ def recommend_movies(features, movies, user_vector, feedback, exploration_rate =
     movies['score'] = sims.flatten()
 
     if np.random.random() < exploration_rate:
-        recs = exploratory_rec(movies, feedback, 1000)
+        recs = exploratory_rec(movies, feedback, 10)
         recs['recommendation_type'] = 'exploration'
     else:
-        recs = exploitative_rec(movies, feedback, 1000)
+        recs = exploitative_rec(movies, feedback, 10)
         recs['recommendation_type'] = 'exploitation'
     
     recs['poster_path'] = "https://image.tmdb.org/t/p/w500" + recs['poster_path']
     
     recs = dict(recs)
-    print(recs['vote_average'])
+    print(len(recs))
+    cast = []
+    director = []
+    goThru = recs['id'].values
+
+    for i in goThru:
+        response = requests.get("https://api.themoviedb.org/3/movie/" + str(i) + "/credits?language=en-US", params=params)
+        data = response.json()
+        castTemp = []
+        for j in range(5):
+            castTemp.append(data["cast"][j]["name"])
+        
+        cast.append(castTemp)
+        
+        for person in data["crew"]:
+            tempDirector = []
+            if person['department'] == "Directing" and person["job"] == "Director":
+                tempDirector.append(person['name'])
+        
+        director.append(tempDirector)
+    
+    print(len(cast))
+    print(len(director))
+        
+    
     return recs
