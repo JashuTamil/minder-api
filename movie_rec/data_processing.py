@@ -1,3 +1,4 @@
+import pickle
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import MultiLabelBinarizer
@@ -18,7 +19,7 @@ params = {
 def load():
     df = pd.read_csv("movie_rec/data/TMDB_movie_dataset_v11.csv")
     df = df[df['vote_count'] >= 10]
-    df = df[['id', 'title', 'genres', 'overview', 'vote_average', 'vote_count', 'runtime', 'poster_path']].fillna('')
+    df = df[['id', 'title', 'genres', 'overview', 'vote_average', 'vote_count', 'runtime', 'poster_path', 'release_date']].fillna('')
     df['genres'] = df['genres'].apply(lambda x: x.split(", "))
     return df
 
@@ -107,30 +108,39 @@ def recommend_movies(features, movies, user_vector, feedback, exploration_rate =
     
     recs['poster_path'] = "https://image.tmdb.org/t/p/w500" + recs['poster_path']
     
-    recs = dict(recs)
-    print(len(recs))
     cast = []
     director = []
     goThru = recs['id'].values
 
     for i in goThru:
-        response = requests.get("https://api.themoviedb.org/3/movie/" + str(i) + "/credits?language=en-US", params=params)
+        response = requests.get(f"https://api.themoviedb.org/3/movie/{i}/credits?language=en-US", params=params)
         data = response.json()
-        castTemp = []
-        for j in range(5):
-            castTemp.append(data["cast"][j]["name"])
         
-        cast.append(castTemp)
+        cast_names = [actor["name"] for actor in data.get("cast", [])[:5]]
+        cast.append(", ".join(cast_names) if cast_names else "N/A")
+
+        # Get director(s)
+        directors = [crew["name"] for crew in data.get("crew", []) 
+                    if crew["job"] == "Director" and crew['department'] == "Directing"]
+        director.append(", ".join(directors) if directors else "N/A")
         
-        for person in data["crew"]:
-            tempDirector = []
-            if person['department'] == "Directing" and person["job"] == "Director":
-                tempDirector.append(person['name'])
-        
-        director.append(tempDirector)
+    print(recs.head())
+    recs["cast"] = cast
+    recs["director"] = director
     
-    print(len(cast))
-    print(len(director))
-        
-    
-    return recs
+    result = recs[['id', 'title', 'overview', 'vote_average', 'runtime', 'poster_path', 'cast', 'director', 'release_date']].to_dict(orient='records')
+
+    return result
+
+
+def router_function():
+    features_path = pathlib.Path("movie_rec/user_data/features.pkl")
+    movies = load()
+
+    with open(features_path, 'rb') as f:
+        features = pickle.load(f)
+
+
+    feedback = load_feedback()
+    user_vec = build_user_profile(features, movies, feedback)
+    return recommend_movies(features, movies, user_vec, feedback, top_n = 10)

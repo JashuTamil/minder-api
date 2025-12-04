@@ -3,14 +3,15 @@ from typing import List
 
 class MovieType(pydantic.BaseModel):
     id: int
-    name: str
-    director: str
-    cast: List[str]
-    year: int
-    description: str
-    url: str
+    title: str
+    overview: str
+    vote_average: float
     runtime: int
-    rating: float
+    poster_path: str
+    cast: List[str]
+    director: str
+    release_date: str
+    
 
 class FeedbackResponse(pydantic.BaseModel):
     likes: List[MovieType]
