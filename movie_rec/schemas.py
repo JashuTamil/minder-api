@@ -8,7 +8,7 @@ class MovieType(pydantic.BaseModel):
     vote_average: float
     runtime: int
     poster_path: str
-    cast: List[str]
+    cast: str
     director: str
     release_date: str
     

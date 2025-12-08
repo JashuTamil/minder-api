@@ -61,8 +61,8 @@ def build_user_profile(features, movies, feedback, alpha=0.5):
 
     features_csr = features.tocsr()
 
-    liked_ind = movies[movies['id'].isin(liked)].index if liked else []
-    disliked_ind = movies[movies['id'].isin(disliked)].index if disliked else []
+    liked_ind = movies[movies['id'].isin(liked)].index if liked else np.asarray([])
+    disliked_ind = movies[movies['id'].isin(disliked)].index if disliked else np.asarray([])
  
 
     f_like = np.asarray(features_csr[liked_ind].mean(axis=0)) if liked_ind.any() else 0
@@ -96,14 +96,17 @@ def exploitative_rec(movies, feedback, top_n):
     return movies[~movies['id'].isin(seen)].sort_values('score', ascending=False)[:top_n]
 
 def recommend_movies(features, movies, user_vector, feedback, exploration_rate = .4, top_n = 10):
-    sims = cosine_similarity(features, user_vector)
-    movies['score'] = sims.flatten()
+    if user_vector is None:
+        movies['score'] = movies['weighted_rating']
+    else:
+        sims = cosine_similarity(features, user_vector)
+        movies['score'] = sims.flatten()
 
     if np.random.random() < exploration_rate:
-        recs = exploratory_rec(movies, feedback, 10)
+        recs = exploratory_rec(movies, feedback, top_n)
         recs['recommendation_type'] = 'exploration'
     else:
-        recs = exploitative_rec(movies, feedback, 10)
+        recs = exploitative_rec(movies, feedback, top_n)
         recs['recommendation_type'] = 'exploitation'
     
     recs['poster_path'] = "https://image.tmdb.org/t/p/w500" + recs['poster_path']
@@ -136,6 +139,13 @@ def recommend_movies(features, movies, user_vector, feedback, exploration_rate =
 def router_function():
     features_path = pathlib.Path("movie_rec/user_data/features.pkl")
     movies = load()
+
+    C = movies['vote_average'].mean()
+    m = movies['vote_count'].quantile(0.5)
+    movies['weighted_rating'] = (
+        (movies['vote_count'] / (movies['vote_count'] + m)) * movies['vote_average'] + 
+        (m / (movies['vote_count'] + m)) * C
+    )
 
     with open(features_path, 'rb') as f:
         features = pickle.load(f)
