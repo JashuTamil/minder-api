@@ -127,11 +127,12 @@ def recommend_movies(features, movies, user_vector, feedback, exploration_rate =
                     if crew["job"] == "Director" and crew['department'] == "Directing"]
         director.append(", ".join(directors) if directors else "N/A")
         
-    print(recs.head())
+    
     recs["cast"] = cast
     recs["director"] = director
     
     result = recs[['id', 'title', 'overview', 'vote_average', 'runtime', 'poster_path', 'cast', 'director', 'release_date']].to_dict(orient='records')
+    print(result)
 
     return result
 
