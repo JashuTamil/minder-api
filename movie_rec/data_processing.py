@@ -19,6 +19,7 @@ params = {
 def load():
     df = pd.read_csv("movie_rec/data/TMDB_movie_dataset_v11.csv")
     df = df[df['vote_count'] >= 10]
+    df = df[df['adult'] == False]
     df = df[['id', 'title', 'genres', 'overview', 'vote_average', 'vote_count', 'runtime', 'poster_path', 'release_date']].fillna('')
     df['genres'] = df['genres'].apply(lambda x: x.split(", "))
     return df
