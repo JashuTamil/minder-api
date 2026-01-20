@@ -139,18 +139,9 @@ def recommend_movies(features, movies, user_vector, feedback, exploration_rate =
 
 
 def router_function():
-    features_path = pathlib.Path("movie_rec/user_data/features.pkl")
     movies = load()
 
-    C = movies['vote_average'].mean()
-    m = movies['vote_count'].quantile(0.5)
-    movies['weighted_rating'] = (
-        (movies['vote_count'] / (movies['vote_count'] + m)) * movies['vote_average'] + 
-        (m / (movies['vote_count'] + m)) * C
-    )
-
-    with open(features_path, 'rb') as f:
-        features = pickle.load(f)
+    features, _, _ = build_features(movies)
 
 
     feedback = load_feedback()
