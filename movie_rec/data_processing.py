@@ -19,9 +19,12 @@ params = {
 def load():
     df = pd.read_csv("movie_rec/data/TMDB_movie_dataset_v11.csv")
     df = df[df['vote_count'] >= 10]
-    df = df[df['adult'] == False]
+    df['adult'] = df['adult'].astype(str).str.lower() == 'true'
+    df = df[~df['adult']]
+    df = df.drop_duplicates(subset='id')
     df = df[['id', 'title', 'genres', 'overview', 'vote_average', 'vote_count', 'runtime', 'poster_path', 'release_date']].fillna('')
     df['genres'] = df['genres'].apply(lambda x: x.split(", "))
+    df = df.reset_index(drop=True)
     return df
 
 def build_features(movies):
