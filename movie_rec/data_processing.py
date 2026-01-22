@@ -9,7 +9,7 @@ import json
 import pathlib
 import requests
 
-feedback_path = pathlib.Path("movie_rec/data/feedback.json")
+feedback_path = pathlib.Path("movie_rec/user_data/feedback.json")
 extras = ['genres', 'vote_count']
 
 params = {
@@ -25,6 +25,14 @@ def load():
     df = df[['id', 'title', 'genres', 'overview', 'vote_average', 'vote_count', 'runtime', 'poster_path', 'release_date']].fillna('')
     df['genres'] = df['genres'].apply(lambda x: x.split(", "))
     df = df.reset_index(drop=True)
+
+    C = df['vote_average'].mean()
+    m = df['vote_count'].quantile(0.5)
+    df['weighted_rating'] = (
+        (df['vote_count'] / (df['vote_count'] + m)) * df['vote_average'] + 
+        (m / (df['vote_count'] + m)) * C
+    )
+
     return df
 
 def build_features(movies):
@@ -34,12 +42,6 @@ def build_features(movies):
     tfidf = TfidfVectorizer(stop_words='english', max_features=5000)
     overview_features = tfidf.fit_transform(movies['overview'])
     
-    C = movies['vote_average'].mean()
-    m = movies['vote_count'].quantile(0.5)
-    movies['weighted_rating'] = (
-        (movies['vote_count'] / (movies['vote_count'] + m)) * movies['vote_average'] + 
-        (m / (movies['vote_count'] + m)) * C
-    )
 
     rating_normalized = (movies['weighted_rating'] - movies['weighted_rating'].min()) / \
                        (movies['weighted_rating'].max() - movies['weighted_rating'].min())
@@ -60,8 +62,10 @@ def save_feedback(feedback):
 
 
 def build_user_profile(features, movies, feedback, alpha=0.5):
-    liked = [movie for movie in feedback['likes']]
-    disliked = [movie for movie in feedback['dislikes']]
+    liked = [movie['id'] for movie in feedback['likes']]
+    disliked = [movie['id'] for movie in feedback['dislikes']]
+
+    feedback = {"likes": liked, "dislikes": disliked}
 
     features_csr = features.tocsr()
 
@@ -76,7 +80,7 @@ def build_user_profile(features, movies, feedback, alpha=0.5):
         return None
 
     user_vector = f_like - (alpha * f_dislike)
-    return user_vector
+    return user_vector, feedback
 
 
 def exploratory_rec(movies, feedback, top_n):
@@ -142,11 +146,14 @@ def recommend_movies(features, movies, user_vector, feedback, exploration_rate =
 
 
 def router_function():
+    features_path = pathlib.Path("movie_rec/user_data/features.pkl")
+
     movies = load()
 
-    features, _, _ = build_features(movies)
+    with open(features_path, 'rb') as f:
+        features = pickle.load(f)
 
 
     feedback = load_feedback()
-    user_vec = build_user_profile(features, movies, feedback)
+    user_vec, feedback = build_user_profile(features, movies, feedback)
     return recommend_movies(features, movies, user_vec, feedback, top_n = 10)
