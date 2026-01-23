@@ -18,11 +18,11 @@ params = {
 
 def load():
     df = pd.read_csv("movie_rec/data/TMDB_movie_dataset_v11.csv")
-    df = df[df['vote_count'] >= 10]
+    df = df[df['vote_count'] >= 5000]
     df['adult'] = df['adult'].astype(str).str.lower() == 'true'
     df = df[~df['adult']]
     df = df.drop_duplicates(subset='id')
-    df = df[['id', 'title', 'genres', 'overview', 'vote_average', 'vote_count', 'runtime', 'poster_path', 'release_date']].fillna('')
+    df = df[['id', 'title', 'genres', 'overview', 'vote_average', 'vote_count', 'runtime', 'poster_path', 'release_date', 'original_language']].fillna('')
     df['genres'] = df['genres'].apply(lambda x: x.split(", "))
     df = df.reset_index(drop=True)
 
@@ -47,7 +47,14 @@ def build_features(movies):
                        (movies['weighted_rating'].max() - movies['weighted_rating'].min())
     rating_features = sp.csr_matrix(rating_normalized.values.reshape(-1, 1))
 
-    features = sp.hstack([genre_features, overview_features, rating_features])
+    popularity_boost = 1.5
+    rating_features *= popularity_boost
+
+    english_indicator = (movies['original_language'] == 'en').astype(float).values.reshape(-1, 1)
+    english_boost = 5.0
+    english_features = sp.csr_matrix(english_indicator * english_boost)
+
+    features = sp.hstack([genre_features, overview_features, rating_features, english_features])
     return features, tfidf, mlb
 
 def load_feedback():
