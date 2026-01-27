@@ -47,11 +47,11 @@ def build_features(movies):
                        (movies['weighted_rating'].max() - movies['weighted_rating'].min())
     rating_features = sp.csr_matrix(rating_normalized.values.reshape(-1, 1))
 
-    popularity_boost = 1.5
+    popularity_boost = 1
     rating_features *= popularity_boost
 
     english_indicator = (movies['original_language'] == 'en').astype(float).values.reshape(-1, 1)
-    english_boost = 5.0
+    english_boost = 1.5
     english_features = sp.csr_matrix(english_indicator * english_boost)
 
     features = sp.hstack([genre_features, overview_features, rating_features, english_features])
@@ -84,7 +84,7 @@ def build_user_profile(features, movies, feedback, alpha=0.5):
     f_dislike = np.asarray(features_csr[disliked_ind].mean(axis=0)) if disliked_ind.any() else 0
 
     if isinstance(f_like, int) and f_like == 0:
-        return None
+        return None, feedback
 
     user_vector = f_like - (alpha * f_dislike)
     return user_vector, feedback
@@ -110,7 +110,7 @@ def exploitative_rec(movies, feedback, top_n):
     seen = set(feedback['likes'] + feedback['dislikes'])
     return movies[~movies['id'].isin(seen)].sort_values('score', ascending=False)[:top_n]
 
-def recommend_movies(features, movies, user_vector, feedback, exploration_rate = .4, top_n = 10):
+def recommend_movies(features, movies, user_vector, feedback, exploration_rate = .6, top_n = 10):
     if user_vector is None:
         movies['score'] = movies['weighted_rating']
     else:
