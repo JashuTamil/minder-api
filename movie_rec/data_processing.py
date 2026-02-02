@@ -47,11 +47,11 @@ def build_features(movies):
                        (movies['weighted_rating'].max() - movies['weighted_rating'].min())
     rating_features = sp.csr_matrix(rating_normalized.values.reshape(-1, 1))
 
-    popularity_boost = 1
+    popularity_boost = 1.5
     rating_features *= popularity_boost
 
     english_indicator = (movies['original_language'] == 'en').astype(float).values.reshape(-1, 1)
-    english_boost = 1.5
+    english_boost = 1.2
     english_features = sp.csr_matrix(english_indicator * english_boost)
 
     features = sp.hstack([genre_features, overview_features, rating_features, english_features])
