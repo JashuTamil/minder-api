@@ -8,6 +8,7 @@ import numpy as np
 import json
 import pathlib
 import requests
+from database.firebase import db
 
 feedback_path = pathlib.Path("movie_rec/user_data/feedback.json")
 extras = ['genres', 'vote_count']
@@ -58,14 +59,16 @@ def build_features(movies):
     return features, tfidf, mlb
 
 def load_feedback():
-    if not feedback_path.exists():
+    doc_ref = db.collection('feedback').document('user1')
+    doc = doc_ref.get()
+    if doc.exists:
+        return doc.to_dict()
+    else:
         return {"likes": [], "dislikes": []}
-    with open(feedback_path, "r") as f:
-        return json.load(f)
 
 def save_feedback(feedback):
-    with open(feedback_path, "w") as f:
-        json.dump(feedback, f)
+    doc_ref = db.collections('feedback').document('user1')
+    doc_ref.set(feedback)
 
 
 def build_user_profile(features, movies, feedback, alpha=0.5):
