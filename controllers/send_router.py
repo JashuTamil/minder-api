@@ -4,7 +4,7 @@ from movie_rec.data_processing import *
 
 from movie_rec.data_processing import load_feedback
 from movie_rec.schemas import FeedbackResponse
-from firebase import db
+
 
 router = APIRouter(prefix="/api/v1/get")
 

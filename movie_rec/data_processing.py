@@ -67,7 +67,7 @@ def load_feedback():
         return {"likes": [], "dislikes": []}
 
 def save_feedback(feedback):
-    doc_ref = db.collections('feedback').document('user1')
+    doc_ref = db.collection('feedback').document('user1')
     doc_ref.set(feedback)
 
 
