@@ -8,9 +8,10 @@ from movie_rec.schemas import FeedbackResponse
 
 router = APIRouter(prefix="/api/v1/get")
 
-@router.get("/get_feedback/")
-async def send_feedback():
-    raw_feedback = load_feedback()
+@router.get("/get_feedback/{user}")
+
+async def send_feedback(user):
+    raw_feedback = load_feedback(user)
     feedback = FeedbackResponse(**raw_feedback)
     return JSONResponse(content=feedback.model_dump_json(), media_type="application/json")
 

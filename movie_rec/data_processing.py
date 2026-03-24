@@ -58,16 +58,16 @@ def build_features(movies):
     features = sp.hstack([genre_features, overview_features, rating_features, english_features])
     return features, tfidf, mlb
 
-def load_feedback():
-    doc_ref = db.collection('feedback').document('user1')
+def load_feedback(user):
+    doc_ref = db.collection('feedback').document(user)
     doc = doc_ref.get()
     if doc.exists:
         return doc.to_dict()
     else:
         return {"likes": [], "dislikes": []}
 
-def save_feedback(feedback):
-    doc_ref = db.collection('feedback').document('user1')
+def save_feedback(feedback, user):
+    doc_ref = db.collection('feedback').document(user)
     doc_ref.set(feedback)
 
 

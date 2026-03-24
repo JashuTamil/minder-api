@@ -9,7 +9,10 @@ router = APIRouter(prefix="/api/v1/upload")
 
 @router.post("/send_feedback/")
 async def file_upload(data: dict = Body(...)):
-    save_feedback(data)
+    print(data)
+    feedback = data[0]
+    user = data[1]
+    save_feedback(feedback, user)
 
     return JSONResponse(status_code=status.HTTP_200_OK, content='File uploaded successfully!')
 
