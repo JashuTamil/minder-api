@@ -155,7 +155,7 @@ def recommend_movies(features, movies, user_vector, feedback, exploration_rate =
     return result
 
 
-def router_function():
+def router_function(user):
     features_path = pathlib.Path("movie_rec/user_data/features.pkl")
 
     movies = load()
@@ -164,6 +164,6 @@ def router_function():
         features = pickle.load(f)
 
 
-    feedback = load_feedback()
+    feedback = load_feedback(user)
     user_vec, feedback = build_user_profile(features, movies, feedback)
     return recommend_movies(features, movies, user_vec, feedback, top_n = 10)
