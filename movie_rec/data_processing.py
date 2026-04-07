@@ -62,8 +62,10 @@ def load_feedback(user):
     doc_ref = db.collection('feedback').document(user)
     doc = doc_ref.get()
     if doc.exists:
+        print("yes")
         return doc.to_dict()
     else:
+        print("no")
         return {"likes": [], "dislikes": []}
 
 def save_feedback(feedback, user):
